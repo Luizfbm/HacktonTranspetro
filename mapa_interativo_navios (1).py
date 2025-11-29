@@ -11,9 +11,9 @@ import numpy as np
 from datetime import datetime
 import json
 
-# ===========================
-# 1. CARREGAR E PROCESSAR DADOS
-# ===========================
+
+#CARREGAR E PROCESSAR DADOS
+
 print("Carregando dados do CSV combinado...")
 df = pd.read_csv('/home/ubuntu/Uploads/consumo_combinado.csv')
 
@@ -33,9 +33,9 @@ print(f"Total de pontos únicos: {len(df)}")
 print(f"Navios: {df['NOME'].unique()}")
 print(f"Período: {df['DATAHORA'].min()} até {df['DATAHORA'].max()}")
 
-# ===========================
-# 2. FUNÇÕES AUXILIARES
-# ===========================
+
+# FUNÇÕES AUXILIARES
+
 
 def velocidade_para_cor(velocidade, v_min, v_max):
     """Converte velocidade em cor do espectro verde-amarelo-vermelho"""
@@ -108,9 +108,9 @@ def criar_popup_html(row):
     """
     return html
 
-# ===========================
-# 3. CRIAR MAPA BASE
-# ===========================
+
+#CRIAR MAPA BASE
+
 print("\nCriando mapa base...")
 
 # Calcular centro do mapa baseado em todos os pontos
@@ -129,9 +129,9 @@ mapa = folium.Map(
 folium.TileLayer('cartodbpositron', name='CartoDB Positron').add_to(mapa)
 folium.TileLayer('cartodbdark_matter', name='CartoDB Dark').add_to(mapa)
 
-# ===========================
-# 4. PROCESSAR DADOS POR NAVIO
-# ===========================
+
+# PROCESSAR DADOS POR NAVIO
+
 print("\nProcessando trajetórias dos navios...")
 
 navios = df['NOME'].unique()
@@ -158,9 +158,9 @@ for navio in navios:
     if len(df_porto) > 0:
         primeiro_porto_idx = df_porto.index[0]
     
-    # ===========================
-    # 5. ADICIONAR PONTOS E SETAS
-    # ===========================
+    
+    # ADICIONAR PONTOS E SETAS
+    
     for idx, row in df_navio.iterrows():
         lat, lon = row['LATITUDE'], row['LONGITUDE']
         coordenadas.append([lat, lon])
@@ -214,9 +214,9 @@ for navio in navios:
                 tooltip=f"Rumo: {row['RUMO']:.1f}°"
             ).add_to(fg_navio)
     
-    # ===========================
-    # 6. ADICIONAR LINHA DE TRAJETÓRIA
-    # ===========================
+    
+    # ADICIONAR LINHA DE TRAJETÓRIA
+    
     # Criar segmentos coloridos da linha
     for i in range(len(coordenadas) - 1):
         cor = velocidade_para_cor(pontos_dados[i]['velocidade'], v_min, v_max)
@@ -228,9 +228,9 @@ for navio in navios:
             tooltip=f"Velocidade: {pontos_dados[i]['velocidade']:.1f} km/h"
         ).add_to(fg_navio)
     
-    # ===========================
-    # 7. ADICIONAR ÍCONE DE ÂNCORA
-    # ===========================
+    
+    #  ADICIONAR ÍCONE DE ÂNCORA
+    
     if primeiro_porto_idx is not None:
         row_porto = df_navio.loc[primeiro_porto_idx]
         
@@ -268,9 +268,9 @@ for navio in navios:
     print(f"  Session IDs: {session_ids}")
     print(f"  Total de pontos: {len(df_navio)}")
 
-# ===========================
-# 8. ADICIONAR LEGENDA
-# ===========================
+
+#  ADICIONAR LEGENDA
+
 print("\nAdicionando legenda...")
 
 # Criar legenda HTML
@@ -332,9 +332,8 @@ legenda_html += '''
 
 mapa.get_root().html.add_child(folium.Element(legenda_html))
 
-# ===========================
+
 # 9. ADICIONAR CONTROLES E FILTROS
-# ===========================
 print("\nAdicionando controles interativos...")
 
 # Adicionar controle de camadas
@@ -357,9 +356,9 @@ plugins.MeasureControl(
     secondary_area_unit='hectares'
 ).add_to(mapa)
 
-# ===========================
+
 # 10. ADICIONAR FILTROS HTML/JavaScript
-# ===========================
+
 print("\nAdicionando filtros interativos...")
 
 # Preparar lista de datas únicas para o filtro
@@ -543,9 +542,9 @@ document.getElementById('filtro-navio').addEventListener('change', function() {{
 
 mapa.get_root().html.add_child(folium.Element(filtros_html))
 
-# ===========================
+
 # 11. SALVAR MAPA HTML
-# ===========================
+
 output_file = '/home/ubuntu/mapa_navios_interativo.html'
 print(f"\nSalvando mapa em: {output_file}")
 mapa.save(output_file)
